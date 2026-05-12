@@ -1,0 +1,12 @@
+# Python 3.11+ — pinned for reproducible installs (ffmpeg required on PATH for pydub)
+fastapi==0.136.1
+uvicorn[standard]==0.46.0
+faster-whisper==1.2.1
+pydub==0.25.1
+python-multipart==0.0.28
+
+# tests
+pytest==8.4.2
+
+# Python 3.13+ removed stdlib audioop; pydub still expects it
+audioop-lts==0.2.2; python_version >= "3.13"

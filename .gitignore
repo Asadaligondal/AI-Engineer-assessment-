@@ -1,0 +1,7 @@
+data/
+__pycache__/
+.venv/
+*.db
+
+# Prep materials (exclude from submission)
+SCRIPT.md

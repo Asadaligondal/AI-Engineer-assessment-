@@ -1,0 +1,15 @@
+# Curl examples (run from transcription_service/)
+# Python 3.11+ and dependencies installed: py -m pip install -r requirements.txt
+# ffmpeg on PATH recommended for pydub decode of non-WAV inputs.
+
+# Terminal A — start server
+# py -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+# Terminal B — enqueue transcription (multipart field name: file)
+# curl -s -X POST "http://127.0.0.1:8000/transcriptions" -F "file=@tests/sample_audio.wav"
+
+# Poll until status is completed or failed (replace JOB_ID)
+# curl -s "http://127.0.0.1:8000/transcriptions/JOB_ID"
+
+# Liveness
+# curl -s "http://127.0.0.1:8000/health"
