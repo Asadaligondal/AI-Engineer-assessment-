@@ -6,8 +6,9 @@ import os
 from typing import Any
 
 from faster_whisper import WhisperModel
+from pydub import AudioSegment
 
-from app.audio_utils import chunk_audio
+from app.audio_utils import UnsupportedFormatError, chunk_audio
 
 _model: WhisperModel | None = None
 
@@ -32,10 +33,34 @@ def transcribe(audio_path: str) -> dict[str, Any]:
     text_parts: list[str] = []
     all_segments: list[dict[str, Any]] = []
 
+    try:
+        duration_ms = len(AudioSegment.from_file(audio_path))
+    except Exception as e:
+        raise UnsupportedFormatError(
+            f"Could not read audio for chunking: {audio_path}"
+        ) from e
+    total_duration_s = duration_ms / 1000.0
+    chunk_ms = int(CHUNK_SECONDS * 1000)
+    is_multi_chunk = duration_ms > chunk_ms
+
     chunk_index = 0
     for chunk_path, start_offset in chunk_audio(
         audio_path, chunk_seconds=CHUNK_SECONDS, overlap_seconds=OVERLAP_SECONDS
     ):
+        if is_multi_chunk:
+            end_s = start_offset + min(
+                CHUNK_SECONDS, total_duration_s - start_offset
+            )
+            n = chunk_index + 1
+            if chunk_index == 0:
+                print(
+                    f"[chunk {n}] processing {start_offset:.1f}s - {end_s:.1f}s"
+                )
+            else:
+                print(
+                    f"[chunk {n}] processing {start_offset:.1f}s - {end_s:.1f}s "
+                    f"(offset +{start_offset:.1f}s)"
+                )
         try:
             segments_gen, _info = model.transcribe(chunk_path)
             for seg in segments_gen:
@@ -59,5 +84,11 @@ def transcribe(audio_path: str) -> dict[str, Any]:
                 except OSError:
                     pass
         chunk_index += 1
+
+    if is_multi_chunk:
+        print(
+            f"[chunking complete] {chunk_index} chunks processed, "
+            f"total duration {total_duration_s:.1f}s"
+        )
 
     return {"text": " ".join(text_parts).strip(), "segments": all_segments}
