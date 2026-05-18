@@ -62,7 +62,7 @@ async def create_transcription(
         raise HTTPException(
             status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail=f"File exceeds maximum size of {MAX_UPLOAD_BYTES} bytes",
-        )
+        ) 
 
     job_id = str(uuid.uuid4())
     dest = AUDIO_UPLOAD_DIR / f"{job_id}{ext}"

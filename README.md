@@ -15,7 +15,7 @@ pip install -r requirements.txt
 **Run:**
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload56
 ```
 
 Default URL: `http://127.0.0.1:8000`. OpenAPI: `http://127.0.0.1:8000/docs`.
